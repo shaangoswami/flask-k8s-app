@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver
+spec:
+  type: NodePort     # or LoadBalancer if cloud provider supports
+  selector:
+    app: webserver
+  ports:
+  - port: 80        # Service port
+    targetPort: 5000 # Container port where Flask listens
+    nodePort: 30080  # Optional static NodePort on the node

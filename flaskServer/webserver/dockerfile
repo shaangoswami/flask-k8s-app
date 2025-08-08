@@ -1,0 +1,36 @@
+# Use official slim Python 3.11 image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system packages needed for mariadb
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libmariadb-dev \
+    python3-distutils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements.txt and install Python packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the full app including templates and static folders
+COPY . .
+
+# Expose Flask's default port
+EXPOSE 5000
+
+# Run the app
+CMD ["python", "app.py"]
+
+
+#...........for docker compose.............
+# FROM python:latest
+# RUN apt-get update
+# RUN apt-get -y upgrade
+# RUN pip install --upgrade pip
+# RUN pip install flask
+# RUN pip install mariadb
+# WORKDIR /flaskProject
+# CMD ["python", "app.py"]
