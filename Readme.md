@@ -15,17 +15,7 @@ kubectl logs deployment/webserver
 -Curl test:
 curl http://webserver.local
 
-📌 Future Improvements
-Use Gunicorn for Flask in production
-
-Add PersistentVolume for database data
-
-Set up TLS with self-signed certs for HTTPS access
-
-
-
-.....
----
-
-## 🧱 Project Structure
-
+📌 Future Improvements:
+- Use Gunicorn for Flask in production
+- Add PersistentVolume for database data
+- Set up TLS with self-signed certs for HTTPS access
