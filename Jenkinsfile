@@ -1,45 +1,107 @@
 pipeline {
-    agent { label 'kubectl-agent' }
+    agent any
 
     environment {
-        K8S_DIR = "k8s"
-        APP_NS  = "default"   // or your namespace
+        // Docker Hub credentials (configured in Jenkins)
+        DOCKER_HUB_USER = 'shaangoswami'
+        IMAGE_NAME = 'flask-app'
+        IMAGE_TAG = "t1"
+        FULL_IMAGE = "${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+        
+        // Minikube on your PC - use a dedicated kubeconfig
+        MINIKUBE_KUBECONFIG = '~/.kube/minikube-config'  // path on Jenkins agent
+        APP_NAMESPACE = 'flask-app'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Build Docker Image') {
             steps {
-                checkout scm
+                dir('flaskServer/webserver') {
+                    sh """
+                        echo "Building ${FULL_IMAGE}..."
+                        docker build -t ${FULL_IMAGE} .
+                        docker tag ${FULL_IMAGE} ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
+                    """
+                }
             }
         }
 
-        stage('Deploy using local image') {
+        stage('Push to Docker Hub') {
             steps {
-                sh """
-                    echo 'Applying MySQL resources...'
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-pvc.yaml
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-deployment.yaml
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-service.yaml
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', 
+                                                 passwordVariable: 'DOCKER_PASS', 
+                                                 usernameVariable: 'DOCKER_USER')]) {
+                    sh """
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                        docker push ${FULL_IMAGE}
+                        docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
 
-                    echo 'Applying webserver resources...'
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
+        stage('Test Application') {
+            steps {
+                script {
+                    // Run containerized tests
+                    sh """
+                        docker run --rm ${FULL_IMAGE} python -c "
+                            from app import app
+                            import requests
+                            with app.test_client() as client:
+                                response = client.get('/')
+                                assert response.status_code == 200
+                                print('Basic Flask test passed!')
+                        "
+                    """
+                }
+            }
+        }
 
-                    echo 'Optional components...'
-                    [ -f ${K8S_DIR}/phpmyadmin-deployment.yaml ] && kubectl apply -n ${APP_NS} -f ${K8S_DIR}/phpmyadmin-deployment.yaml
-                    [ -f ${K8S_DIR}/phpmyadmin-service.yaml ]    && kubectl apply -n ${APP_NS} -f ${K8S_DIR}/phpmyadmin-service.yaml
-                    [ -f ${K8S_DIR}/flask-ingress.yaml ]         && kubectl apply -n ${APP_NS} -f ${K8S_DIR}/flask-ingress.yaml
+        stage('Deploy') {
+            steps {
+                withKubeConfig([credentialsId: 'minikube-kubeconfig', context: 'minikube']) {
+                    sh """
+                        # Create namespace
+                        kubectl create namespace ${APP_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 
-                    echo 'Wait for webserver rollout...'
-                    kubectl rollout status deployment/webserver -n ${APP_NS}
-                """
+                        # Update image tag in deployment YAML dynamically
+                        sed -i 's|image: .*|image: ${FULL_IMAGE}|g' k8s/webserver-deployment.yaml
+                        sed -i '/image:/a\          imagePullPolicy: Always' k8s/webserver-deployment.yaml
+
+                        # Deploy full stack to Minikube
+                        echo 'Deploying MySQL...'
+                        kubectl apply -n ${APP_NAMESPACE} -f k8s/mysql-pvc.yaml
+                        kubectl apply -n ${APP_NAMESPACE} -f k8s/mysql-deployment.yaml
+                        kubectl apply -n ${APP_NAMESPACE} -f k8s/mysql-service.yaml
+
+                        echo 'Deploying Flask app...'
+                        kubectl apply -n ${APP_NAMESPACE} -f k8s/webserver-deployment.yaml
+                        kubectl apply -n ${APP_NAMESPACE} -f k8s/webserver-service.yaml
+
+                        echo 'Optional components...'
+                        [ -f k8s/phpmyadmin-deployment.yaml ] && kubectl apply -n ${APP_NAMESPACE} -f k8s/phpmyadmin-deployment.yaml
+                        [ -f k8s/phpmyadmin-service.yaml ]    && kubectl apply -n ${APP_NAMESPACE} -f k8s/phpmyadmin-service.yaml
+
+                        echo 'Waiting for rollout...'
+                        kubectl rollout status deployment/webserver -n ${APP_NAMESPACE} --timeout=300s
+                    """
+                }
             }
         }
     }
 
     post {
         always {
-            sh 'kubectl get pods,svc -n ${APP_NS}'
+            withKubeConfig([credentialsId: 'minikube-kubeconfig', context: 'minikube']) {
+                sh 'kubectl get pods,svc -n ${APP_NAMESPACE}'
+            }
+        }
+        success {
+            echo "✅ Deployed ${FULL_IMAGE} to Minikube successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs above."
         }
     }
 }
