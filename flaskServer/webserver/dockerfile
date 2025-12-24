@@ -10,6 +10,11 @@ ENV http_proxy=$http_proxy
 ENV https_proxy=$https_proxy
 ENV no_proxy=$no_proxy
 
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libmariadb-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # ⭐ CRITICAL FIX: Configure APT to use proxy
 # APT requires /etc/apt/apt.conf.d/proxy file, not just env vars
 RUN if [ -n "$http_proxy" ]; then \
@@ -20,7 +25,6 @@ RUN if [ -n "$http_proxy" ]; then \
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    gcc \
     default-libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
