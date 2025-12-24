@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: flask-app.local:latest
-        imagePullPolicy: Never
+        image: shaangoswami/flask-app:latest 
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
           
