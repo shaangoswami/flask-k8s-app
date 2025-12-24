@@ -62,6 +62,8 @@ pipeline {
             steps {
                 withKubeConfig([credentialsId: 'minikube-kubeconfig', context: 'minikube']) {
                     sh """
+                        kubectl config current-context #should show 'minikube'
+                        
                         # Create namespace
                         kubectl create namespace ${APP_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 
