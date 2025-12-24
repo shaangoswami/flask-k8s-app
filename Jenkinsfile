@@ -9,8 +9,8 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         FULL_IMAGE = "${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
 
-        HTTP_PROXY = 'http://proxy.example.com:8080'
-        HTTPS_PROXY = 'http://proxy.example.com:8080'
+        HTTP_PROXY = 'http://10.20.4.125:3128'
+        HTTPS_PROXY = 'http://10.20.4.125:3128'
         NO_PROXY = 'localhost,127.0.0.1,10.20.41.184'
         
         // Kubernetes configuration
