@@ -1,37 +1,7 @@
 pipeline {
     agent {
-        kubernetes {
-            yaml """
-        apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    jenkins: agent
-spec:
-  serviceAccountName: jenkins
-  containers:
-  - name: docker
-    image: docker:latest
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
-  - name: kubectl
-    image: bitnami/kubectl:1.28
-    command:
-    - cat
-    tty: true
-  volumes:
-  - name: docker-sock
-    hostPath:
-      path: /var/run/docker.sock
-      type: Socket
-"""
-        }
-    }    
-
+        label 'my-pc-agent'
+    }
     environment {
         // Docker Hub configuration
         DOCKER_HUB_USER = 'shaangoswami'
