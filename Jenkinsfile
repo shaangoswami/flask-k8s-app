@@ -142,7 +142,7 @@ spec:
             steps {
                 script {
                     echo '=== Deploying ==='
-                    withCredentials([file(credentialsId: "${minikube-kubeconfig}", variable: 'KUBECONFIG')]) {
+                    withCredentials([file(credentialsId: "${MINIKUBE_KUBECONFIG}", variable: 'KUBECONFIG')]) {
                         sh """
                             set -e  # Exit on any error
                             
