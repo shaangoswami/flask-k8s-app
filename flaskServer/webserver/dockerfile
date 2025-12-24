@@ -1,13 +1,16 @@
 FROM python:3.9-slim
 # Accept proxy build arguments
-ARG http_proxy
-ARG https_proxy
-ARG no_proxy
+ARG http_proxy=""
+ARG https_proxy=""
+ARG no_proxy=""
 
 # Set as environment variables for build
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
-ENV no_proxy=$no_proxy
+ENV HTTP_PROXY=${http_proxy}
+ENV HTTPS_PROXY=${https_proxy}
+ENV NO_PROXY=${no_proxy}
+ENV http_proxy=${http_proxy}
+ENV https_proxy=${https_proxy}
+ENV no_proxy=${no_proxy}
 
 # Use reliable mirrors and install dependencies
 RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list && \
