@@ -8,6 +8,10 @@ pipeline {
         IMAGE_NAME = 'flask-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
         FULL_IMAGE = "${DOCKER_HUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+        HTTP_PROXY = 'http://proxy.example.com:8080'
+        HTTPS_PROXY = 'http://proxy.example.com:8080'
+        NO_PROXY = 'localhost,127.0.0.1,10.20.41.184'
         
         // Kubernetes configuration
         APP_NAMESPACE = 'default'
@@ -39,9 +43,10 @@ pipeline {
                     dir('flaskServer/webserver') {
                         sh """
                             docker build \
-                                --build-arg http_proxy=http://10.20.4.125:3128 \
-                                --build-arg https_proxy=http://10.20.4.125:3128 \
-                                -t ${FULL_IMAGE} .
+                            --build-arg http_proxy=${HTTP_PROXY} \
+                            --build-arg https_proxy=${HTTPS_PROXY} \
+                            --build-arg no_proxy=${NO_PROXY} \
+                            -t shaangoswami/flask-app:${BUILD_NUMBER} .
                         """
                         sh """
                             # Build the Docker image
