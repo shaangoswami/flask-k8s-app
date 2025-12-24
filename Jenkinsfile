@@ -38,6 +38,12 @@ pipeline {
                     echo "=== Building Docker image: ${FULL_IMAGE} ==="
                     dir('flaskServer/webserver') {
                         sh """
+                            docker build \
+                                --build-arg http_proxy=http://10.20.4.125:3128 \
+                                --build-arg https_proxy=http://10.20.4.125:3128 \
+                                -t ${FULL_IMAGE} .
+                        """
+                        sh """
                             # Build the Docker image
                             docker build -t ${FULL_IMAGE} .
                             
