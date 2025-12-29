@@ -22,6 +22,22 @@ pipeline {
             } 
         }
 
+        stage('Create Namespace') { 
+            steps { 
+                sh """
+                    echo "🏗️  Creating namespace: ${APP_NS}"
+                    # Create namespace if it doesn't exist
+                    kubectl get namespace ${APP_NS} > /dev/null 2>&1
+                    if [ \$? -ne 0 ]; then
+                        kubectl create namespace ${APP_NS}
+                        echo "✅ Namespace created"
+                    else
+                        echo "ℹ️  Namespace already exists"
+                    fi
+                """
+            } 
+        }
+
         stage('Build') { 
             steps { 
                 dir(DOCKERFILE_DIR) {
