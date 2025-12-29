@@ -104,8 +104,6 @@ pipeline {
                 echo ""
                 kubectl get svc -n ${APP_NS}
             """
-            
-            # Cleanup
             sh "docker rmi ${IMAGE_NAME} 2>/dev/null || true"
         }
         failure {
