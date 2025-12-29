@@ -12,6 +12,9 @@ spec:
       labels:
         app: mysqldb
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: kc-w1  # Same node as PV
+        
       containers:
       - name: mysqldb
         image: mysql:latest
