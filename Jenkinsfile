@@ -85,7 +85,9 @@ pipeline {
 
                     echo "2️⃣ Deploying Webserver..."
                     # Update image in deployment
+                    
                     sed "s|image:.*|image: ${IMAGE_NAME}|g" ${K8S_DIR}/webserver-deployment.yaml | kubectl apply -n ${APP_NS} -f -
+                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
                     echo "3️⃣ Deploying phpMyAdmin..."
