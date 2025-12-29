@@ -98,7 +98,7 @@ pipeline {
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/flask-ingress.yaml
 
                     echo "5️⃣ Waiting for MySQL rollout..."
-                    kubectl rollout status deployment/mysql -n ${APP_NS} --timeout=120s || echo "MySQL rollout check completed"
+                    kubectl rollout status deployment/mysqldb -n ${APP_NS} --timeout=120s || echo "MySQL rollout check completed"
 
                     echo "6️⃣ Waiting for Webserver rollout..."
                     kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s
