@@ -4,11 +4,21 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Copy requirements.txt and install Python packages
+# 1. INSTALL SYSTEM DEPENDENCIES FIRST
+# mariadb-connector-c is required for the mariadb Python package
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    mariadb-client \
+    libmariadb-dev \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Copy requirements.txt and install Python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the full app including templates and static folders
+# 3. Copy the full app including templates and static folders
 COPY . .
 
 # Expose Flask's default port
