@@ -22,18 +22,16 @@ pipeline {
             } 
         }
 
-        stage('Create Namespace') { 
+        stage('Verify Namespace') { 
             steps { 
                 sh """
-                    echo "🏗️  Creating namespace: ${APP_NS}"
-                    # Create namespace if it doesn't exist
-                    kubectl get namespace ${APP_NS} > /dev/null 2>&1
-                    if [ \$? -ne 0 ]; then
-                        kubectl create namespace ${APP_NS}
-                        echo "✅ Namespace created"
-                    else
-                        echo "ℹ️  Namespace already exists"
-                    fi
+                    echo "🔍 Verifying namespace: ${APP_NS}"
+                    kubectl get namespace ${APP_NS} || {
+                        echo "❌ ERROR: Namespace ${APP_NS} not found!"
+                        echo "Create it manually with: kubectl create namespace ${APP_NS}"
+                        exit 1
+                    }
+                    echo "✅ Namespace ${APP_NS} exists"
                 """
             } 
         }
