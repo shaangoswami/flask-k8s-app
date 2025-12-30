@@ -2,8 +2,6 @@ pipeline {
     agent { label 'kubectl-agent' } 
 
     options {
-        // Enable GitHub webhook trigger
-        githubPush()
         
         // Optional: Configure GitHub project URL
         // pipelineTriggers([githubPush()])  // Alternative syntax if needed
