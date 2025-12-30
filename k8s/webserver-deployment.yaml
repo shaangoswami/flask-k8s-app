@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: flask-webserver:${BUILD_NUMBER}
+        image: flask-webserver:v1
         imagePullPolicy: Never
         ports:
         - containerPort: 5000
