@@ -1,17 +1,19 @@
 pipeline { 
     agent { label 'kubectl-agent' } 
 
-    properties([
+    options {
         // Enable GitHub webhook trigger
-        pipelineTriggers([githubPush()]),
+        githubPush()
         
         // Optional: Configure GitHub project URL
-        [$class: 'GitHubProjectProperty', 
-         projectUrlStr: 'https://github.com/shaangoswami/flask-k8s-app/'],
+        // pipelineTriggers([githubPush()])  // Alternative syntax if needed
         
         // Optional: Disable concurrent builds
         disableConcurrentBuilds()
-    ])
+        
+        // Optional: Add timeout
+        timeout(time: 30, unit: 'MINUTES')
+    }
     
     triggers {
         // Alternative declarative syntax
