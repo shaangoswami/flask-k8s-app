@@ -100,13 +100,21 @@ pipeline {
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
-
                     
+                    echo "3️⃣ Forcing cleanup of any 'ghost' or 'stuck' pods"
+                    # This deletes pods that are Terminating, Error, or ImagePullBackOff
+                    kubectl get pods -n flask-app | grep -v 'Running' | awk '{print \$1}' | xargs kubectl delete pod -n flask-app --force --grace-period=0 || true
+
+                    echo "4️⃣ Monitoring Rollout (3-minute timeout)"
+                    if ! kubectl rollout status deployment/webserver -n flask-app --timeout=180s; then
+                        echo "❌ Rollout timed out! Forcing a restart..."
+                        kubectl rollout restart deployment/webserver -n flask-app
+                        exit 1
+                    fi
 
                    
 
-                    echo "6️⃣ Waiting for Webserver rollout..."
-                    kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s
+                  
 
                    
 
