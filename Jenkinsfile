@@ -93,7 +93,7 @@ pipeline {
                 sh """
                     
                     echo "Verifying generated yaml" 
-                    ed "s@image:.*@image: ${IMAGE_NAME}@g" ${K8S_DIR}/webserver-deployment.yaml > debug.yaml
+                    sed "s@image:.*@image: ${IMAGE_NAME}@g" ${K8S_DIR}/webserver-deployment.yaml > debug.yaml
                     grep "image:" debug.yaml
                     kubectl apply -n ${APP_NS} -f debug.yaml
                     
