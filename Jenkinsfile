@@ -4,7 +4,7 @@ pipeline {
     triggers {
         // pollSCM('H/2 * * * *')  // Poll every 2 minutes (working)
         // githubPush()  // Comment out until webhooks work
-        githubPush(branchFilter: 'my-pc')
+        githubPush()
     }
     
     options {
