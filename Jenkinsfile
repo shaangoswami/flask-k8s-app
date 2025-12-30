@@ -92,11 +92,12 @@ pipeline {
             steps { 
                 sh """
                     
-
-                    echo "2️⃣ Deploying Webserver..."
-                    # Update image in deployment
+                    echo "Verifying generated yaml" 
+                    ed "s@image:.*@image: ${IMAGE_NAME}@g" ${K8S_DIR}/webserver-deployment.yaml > debug.yaml
+                    grep "image:" debug.yaml
+                    kubectl apply -n ${APP_NS} -f debug.yaml
                     
-                    sed "s|image:.*|image: ${IMAGE_NAME}|g" ${K8S_DIR}/webserver-deployment.yaml | kubectl apply -n ${APP_NS} -f -
+                    echo "2️⃣ Deploying Webserver..."
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
