@@ -77,6 +77,7 @@ pipeline {
                 sh """
                     echo "⬆️  Importing to MicroK8s..."
                     docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
+                    microk8s.ctr --namespace k8s.io image rm ${IMAGE_NAME} || true
                     microk8s.ctr --namespace k8s.io image import /tmp/flask-image.tar
                     rm -f /tmp/flask-image.tar
                     
