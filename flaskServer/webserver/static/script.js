@@ -6,11 +6,9 @@ navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const targetPage = btn.dataset.page;
         
-        // Update active button
         navBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // Show target page
         pages.forEach(page => {
             page.classList.remove('active');
             if (page.id === targetPage) {
@@ -25,14 +23,10 @@ async function loadVisitorCount() {
     try {
         const response = await fetch('/api/stats');
         const data = await response.json();
-        const counter = document.getElementById('visitor-count');
-        
-        // Animate to the real count
         animateCounterTo(data.visitors);
     } catch (error) {
         console.error('Error loading stats:', error);
-        // Fallback to random number if API fails
-        animateCounterTo(Math.floor(Math.random() * 1000) + 500);
+        animateCounterTo(0);
     }
 }
 
@@ -40,7 +34,7 @@ async function loadVisitorCount() {
 function animateCounterTo(target) {
     const counter = document.getElementById('visitor-count');
     let current = 0;
-    const increment = target / 50;
+    const increment = Math.max(1, target / 50);
     
     const timer = setInterval(() => {
         current += increment;
@@ -54,7 +48,7 @@ function animateCounterTo(target) {
 }
 
 // Notification System
-function showNotification(message = "Welcome! 🎉 Your Flask app is running perfectly!") {
+function showNotification(message = "Welcome! 🎉 Your Flask app is running!") {
     const notification = document.getElementById('notification');
     const notificationText = document.getElementById('notification-text');
     
