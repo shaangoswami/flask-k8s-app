@@ -1,15 +1,16 @@
 pipeline { 
     agent { label 'kubectl-agent' } 
 
-    options { 
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        timestamps()
-        timeout(time: 30, unit: 'MINUTES')
+    triggers {
+        // pollSCM('H/2 * * * *')  // Poll every 2 minutes (working)
+        // githubPush()  // Comment out until webhooks work
+        githubPush(branchFilter: 'my-pc')
     }
     
-    triggers {
-        // Alternative declarative syntax
-        githubPush()
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        // GitHub project URL helps with webhook identification
+        githubProjectProperty(projectUrlStr: 'https://github.com/shaangoswami/flask-k8s-app')
     }
     
     environment { 
