@@ -1,4 +1,106 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Web Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="icon">🚀</span>
+                <h1>Flask App</h1>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-page="home">Home</button>
+                <button class="nav-btn" data-page="about">About</button>
+                <button class="nav-btn" data-page="contact">Contact</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Home Page -->
+            <section id="home" class="page active">
+                <div class="hero">
+                    <h2 class="fade-in">Welcome to Flask Application</h2>
+                    <p class="fade-in delay-1">A minimal web app deployed on Kubernetes with MySQL backend</p>
+                    <div class="stats fade-in delay-2">
+                        <div class="stat-card">
+                            <h3 id="visitor-count">0</h3>
+                            <p>Visitors</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>✓</h3>
+                            <p>Connected</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>K8s</h3>
+                            <p>Deployed</p>
+                        </div>
+                    </div>
+                    <button class="cta-btn" onclick="showNotification()">Get Started</button>
+                </div>
+            </section>
+
+            <!-- About Page -->
+            <section id="about" class="page">
+                <div class="content">
+                    <h2>About This Project</h2>
+                    <div class="features">
+                        <div class="feature-card">
+                            <span class="feature-icon">🐍</span>
+                            <h3>Python Flask</h3>
+                            <p>Lightweight web framework for building scalable applications</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">🗄️</span>
+                            <h3>MySQL Database</h3>
+                            <p>Reliable relational database for persistent storage</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">☸️</span>
+                            <h3>Kubernetes</h3>
+                            <p>Container orchestration for deployment and scaling</p>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-icon">🔄</span>
+                            <h3>CI/CD Pipeline</h3>
+                            <p>Automated testing and deployment with Jenkins</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Page -->
+            <section id="contact" class="page">
+                <div class="content">
+                    <h2>Get In Touch</h2>
+                    <form class="contact-form" onsubmit="handleSubmit(event)">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Flask Application | Deployed </p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+<!-- <!doctype html>
 
 <html lang="nl">
 <head>
@@ -12,4 +114,4 @@
 <body>
 <h1>It is working :D</h1>
 </body>
-</html>
+</html> -->
