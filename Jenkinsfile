@@ -110,6 +110,21 @@ pipeline {
                 """
             } 
         }
+        stage('Print Commit Details') {
+    steps {
+        script {
+            // Get all changes in this build
+            def changeLogSets = currentBuild.changeSets
+            for (int i = 0; i < changeLogSets.size(); i++) {
+                def entries = changeLogSets[i].items
+                for (int j = 0; j < entries.length; j++) {
+                    def entry = entries[j]
+                    echo "📝 Commit: [${entry.commitId.substring(0,7)}] by ${entry.author}: ${entry.msg}"
+                }
+            }
+        }
+    }
+}
     } 
   
     post { 
