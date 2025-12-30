@@ -14,7 +14,7 @@ pipeline {
     environment { 
         K8S_DIR = "k8s" 
         APP_NS = "flask-app"
-        IMAGE_NAME = "flask-webserver:${BUILD_NUMBER}"  // Removed space after colon
+        IMAGE_NAME = "flask-webserver:v1"  // Removed space after colon
         DOCKERFILE_DIR = "flaskServer/webserver"
     } 
   
