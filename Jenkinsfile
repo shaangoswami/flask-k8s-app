@@ -89,10 +89,7 @@ pipeline {
         stage('Deploy') { 
             steps { 
                 sh """
-                    // echo "1️⃣ Deploying MySQL..."
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-pvc.yaml 
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-deployment.yaml
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/mysql-service.yaml
+                    
 
                     echo "2️⃣ Deploying Webserver..."
                     # Update image in deployment
@@ -101,21 +98,15 @@ pipeline {
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
-                    // echo "3️⃣ Deploying phpMyAdmin..."
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/phpmyadmin-deployment.yaml
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/phpmyadmin-service.yaml
 
-                    // echo "4️⃣ Deploying Ingress..."
-                    // kubectl apply -n ${APP_NS} -f ${K8S_DIR}/flask-ingress.yaml
+                    
 
-                    // echo "5️⃣ Waiting for MySQL rollout..."
-                    // kubectl rollout status deployment/mysqldb -n ${APP_NS} --timeout=120s || echo "MySQL rollout check completed"
+                   
 
                     echo "6️⃣ Waiting for Webserver rollout..."
                     kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s
 
-                    // echo "7️⃣ Waiting for phpMyAdmin rollout..."
-                    // kubectl rollout status deployment/phpmyadmin -n ${APP_NS} --timeout=120s || echo "phpMyAdmin rollout check completed"
+                   
 
                     echo "✅ All deployments complete!"
                 """
