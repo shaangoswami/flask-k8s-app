@@ -1,3 +1,4 @@
+hi
 # 🚀 Flask App with MariaDB and phpMyAdmin on Kubernetes
 
 This project deploys a Flask web application connected to a MariaDB database, with phpMyAdmin for database management — all containerized with Docker and orchestrated using Kubernetes.
@@ -20,5 +21,6 @@ curl http://webserver.local
 - Add PersistentVolume for database data
 - Set up TLS with self-signed certs for HTTPS access
 - Testing automation
+
 
 
