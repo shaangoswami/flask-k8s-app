@@ -22,36 +22,12 @@ pipeline {
         stage('Checkout') { 
             steps { 
                 checkout scm
-                sh """
-                    echo "📁 Project structure: "
-                    ls -la
-                    echo ""
-                    echo "📁 Dockerfile location: "
-                    ls -la ${DOCKERFILE_DIR}/
-                """
-            } 
+                 } 
         }
-
-        stage('Verify Namespace') { 
-            steps { 
-                sh """
-                    echo "🔍 Verifying namespace: ${APP_NS}"
-                    kubectl get namespace ${APP_NS} || {
-                        echo "❌ ERROR: Namespace ${APP_NS} not found!"
-                        echo "Create it manually with: kubectl create namespace ${APP_NS}"
-                        exit 1
-                    }
-                    echo "✅ Namespace ${APP_NS} exists"
-                """
-            } 
-        }
-
         stage('Build') { 
             steps { 
                 dir(DOCKERFILE_DIR) {
-                    sh """
-                        echo "🔨 Building from: \$(pwd)"
-                        echo "📦 Image: ${IMAGE_NAME}"
+                    sh """  
                         docker build -t ${IMAGE_NAME} .
                     """
                 }
@@ -64,7 +40,6 @@ pipeline {
                     echo "🧪 Testing image..."
                     docker run --rm ${IMAGE_NAME} python --version
                     echo "✅ Python version check passed"
-                    
                     echo "📦 Checking installed packages..."
                     docker run --rm ${IMAGE_NAME} pip list | grep -i flask || echo "Flask package not found"
                 """
@@ -99,14 +74,13 @@ pipeline {
                     echo "3️⃣ Forcing cleanup of any 'ghost' or 'stuck' pods"
                     # This deletes pods that are Terminating, Error, or ImagePullBackOff
                     kubectl get pods -n flask-app | grep -v 'Running' | awk '{print \$1}' | xargs kubectl delete pod -n flask-app --force --grace-period=0 || true
-
+                   
                     echo "4️⃣ Monitoring Rollout (3-minute timeout)"
                     if ! kubectl rollout status deployment/webserver -n flask-app --timeout=180s; then
                         echo "❌ Rollout timed out! Forcing a restart..."
                         kubectl rollout restart deployment/webserver -n flask-app
                         exit 1
                     fi
-
                     echo "✅ All deployments complete!"
                 """
             } 
