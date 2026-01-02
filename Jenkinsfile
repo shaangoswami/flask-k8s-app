@@ -7,7 +7,7 @@ pipeline {
     
     options {
         timeout(time: 30, unit: 'MINUTES')
-        // GitHub project URL helps with webhook identification
+        // GitHub project URL helps with webhook identifications
         githubProjectProperty(projectUrlStr: 'https://github.com/shaangoswami/flask-k8s-app')
     }
     
