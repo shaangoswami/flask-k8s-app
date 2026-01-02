@@ -26,10 +26,10 @@ pipeline {
         }
         stage('Build') { 
             agent { label 'jenkins-agent' }
-            container('docker') {
             steps { 
-                dir(DOCKERFILE_DIR) {
-                    sh """  
+                container('docker') {
+                    dir(DOCKERFILE_DIR) {
+                        sh """  
                         docker build -t ${IMAGE_NAME} .
                     """
                 }
@@ -39,25 +39,25 @@ pipeline {
 
         stage('Test') { 
             agent { label 'jenkins-agent' }
-            container('docker') {
             steps { 
-                sh """
-                    echo "🧪 Testing image..."
-                    docker run --rm ${IMAGE_NAME} python --version
-                    echo "✅ Python version check passed"
-                    echo "📦 Checking installed packages..."
-                    docker run --rm ${IMAGE_NAME} pip list | grep -i flask || echo "Flask package not found"
-                """
-            }
+                container('docker') {
+                    sh """
+                        echo "🧪 Testing image..."
+                        docker run --rm ${IMAGE_NAME} python --version
+                        echo "✅ Python version check passed"
+                        echo "📦 Checking installed packages..."
+                        docker run --rm ${IMAGE_NAME} pip list | grep -i flask || echo "Flask package not found"
+                    """    
+                }
             } 
         }
 
         stage('Import to K8s') { 
             agent { label 'jenkins-agent' }
-            container('docker') {
             steps { 
-                sh """
-                    echo "⬆️ Importing to MicroK8s..."
+                container('docker') {
+                    sh """
+                        echo "⬆️ Importing to MicroK8s..."
                     docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
                     microk8s.ctr --namespace k8s.io image rm ${IMAGE_NAME} || true
                     microk8s.ctr --namespace k8s.io image import /tmp/flask-image.tar
