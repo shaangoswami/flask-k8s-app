@@ -53,9 +53,9 @@ pipeline {
         }
 
         stage('Import to K8s') { 
-            agent { label 'jenkins-agent' }
+            
             steps { 
-                container('docker') {
+                
                     sh """
                         echo "⬆️ Importing to MicroK8s..."
                     docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
@@ -67,7 +67,7 @@ pipeline {
                     microk8s.ctr --namespace k8s.io images ls | grep flask-webserver
                 """
                 } 
-            }
+            
         }
 
         stage('Deploy') { 
