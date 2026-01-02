@@ -25,7 +25,7 @@ pipeline {
                  } 
         }
         stage('Build') { 
-            agent { label 'jenkins-agent }
+            agent { label 'jenkins-agent' }
             steps { 
                 dir(DOCKERFILE_DIR) {
                     sh """  
