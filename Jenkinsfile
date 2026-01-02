@@ -26,17 +26,20 @@ pipeline {
         }
         stage('Build') { 
             agent { label 'jenkins-agent' }
+            container('docker') {
             steps { 
                 dir(DOCKERFILE_DIR) {
                     sh """  
                         docker build -t ${IMAGE_NAME} .
                     """
                 }
+            }
             } 
         }
 
         stage('Test') { 
             agent { label 'jenkins-agent' }
+            container('docker') {
             steps { 
                 sh """
                     echo "🧪 Testing image..."
@@ -45,11 +48,13 @@ pipeline {
                     echo "📦 Checking installed packages..."
                     docker run --rm ${IMAGE_NAME} pip list | grep -i flask || echo "Flask package not found"
                 """
+            }
             } 
         }
 
         stage('Import to K8s') { 
             agent { label 'jenkins-agent' }
+            container('docker') {
             steps { 
                 sh """
                     echo "⬆️ Importing to MicroK8s..."
@@ -61,7 +66,8 @@ pipeline {
                     echo "✅ Available images: "
                     microk8s.ctr --namespace k8s.io images ls | grep flask-webserver
                 """
-            } 
+                } 
+            }
         }
 
         stage('Deploy') { 
