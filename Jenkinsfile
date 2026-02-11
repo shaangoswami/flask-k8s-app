@@ -35,7 +35,7 @@ pipeline {
                 }
         }
         stage('Build') { 
-            // agent { label 'jenkins-agent' }
+            agent { label 'jenkins-agent' }
             
             steps { 
                 container('docker') {
@@ -49,7 +49,7 @@ pipeline {
         }
 
         stage('Test') { 
-            // agent { label 'jenkins-agent' }
+            agent { label 'jenkins-agent' }
             steps { 
                 container('docker') {
                     sh """
