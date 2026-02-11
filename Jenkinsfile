@@ -35,7 +35,8 @@ pipeline {
             }
         }
         stage('Build') { 
-            agent { label 'jenkins-agent' }
+            // agent { label 'jenkins-agent' }
+            
             steps { 
                 container('docker') {
                     dir(DOCKERFILE_DIR) {
@@ -48,7 +49,7 @@ pipeline {
         }
 
         stage('Test') { 
-            agent { label 'jenkins-agent' }
+            // agent { label 'jenkins-agent' }
             steps { 
                 container('docker') {
                     sh """
