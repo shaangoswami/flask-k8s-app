@@ -27,12 +27,12 @@ pipeline {
         stage('Capture Commit ID') {
             steps {
                 script {
-                    def commitId = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    // def commitId = env.GIT_COMMIT
-                    // Assuming the following step replaces the placeholder in your index.html
-                    sh "sed -i 's/__COMMIT_ID__/${commitId}/g' flaskServer/webserver/templates/index.html"
+                    def commitId = env.GIT_COMMIT
+                    sh """
+                        sed -i 's/__COMMIT_ID__/${commitId}/g' flaskServer/webserver/templates/index.html
+                    """
+                    }
                 }
-            }
         }
         stage('Build') { 
             // agent { label 'jenkins-agent' }
