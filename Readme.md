@@ -8,7 +8,7 @@ MariaDB: Used internally, exposed only in-cluster
 
 🔍 Debug & Testing
 -Check all resources:
-kubectl get all
+kubectl get all.
 
 -Logs for Flask app:
 kubectl logs deployment/webserver
@@ -21,6 +21,7 @@ curl http://webserver.local
 - Add PersistentVolume for database data
 - Set up TLS with self-signed certs for HTTPS access
 - Testing automation
+
 
 
 
