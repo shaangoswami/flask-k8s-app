@@ -19,6 +19,7 @@ pipeline {
     }
     
     environment { 
+        DOCKER_BUILDKIT= '0'
         K8S_DIR = "k8s" 
         APP_NS = "flask-app"
         IMAGE_NAME = "flask-webserver:v1"
