@@ -13,14 +13,12 @@ kubectl get all.
 -Logs for Flask app:
 kubectl logs deployment/webserver
 
--Curl test:
-curl http://webserver.local
-
 📌 Future Improvements:
 - Use Gunicorn for Flask in production
 - Add PersistentVolume for database data
 - Set up TLS with self-signed certs for HTTPS access
 - Testing automation
+
 
 
 
