@@ -5,7 +5,7 @@
 pipeline { 
     agent {
         kubernetes {
-            inheritFrom 'kubectl-agent'  // <-- Matches the name in Jenkins UI
+            inheritFrom 'kubectl-agent'  // <-- Matches the name in Jenkins UI 
         }
     } 
 
