@@ -19,7 +19,6 @@ pipeline {
     }
     
     environment { 
-        DOCKER_BUILDKIT= '0'
         K8S_DIR = "k8s" 
         APP_NS = "flask-app"
         IMAGE_NAME = "flask-webserver:v1"
@@ -55,6 +54,7 @@ pipeline {
                 container('jnlp') { // 'docker-agent-v2' uses 'jnlp' for the main container
                     dir(DOCKERFILE_DIR) {
                         sh """  
+                            export DOCKER_BUILDKIT=0
                             docker build -t ${IMAGE_NAME} .
                         """
                     }
