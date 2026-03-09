@@ -81,6 +81,7 @@ pipeline {
                         echo "✅ Python version check passed"
                         echo "📦 Checking installed packages..."
                         docker run --rm ${IMAGE_NAME} pip list | grep -i flask || echo "Flask package not found"
+                        docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
                     """    
                 }
             } 
@@ -91,7 +92,6 @@ pipeline {
             steps { 
                 sh """
                     echo "⬆️ Importing to MicroK8s..."
-                    docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
                     microk8s.ctr --namespace k8s.io image rm ${IMAGE_NAME} || true
                     microk8s.ctr --namespace k8s.io image import /tmp/flask-image.tar
                     rm -f /tmp/flask-image.tar
@@ -156,9 +156,9 @@ pipeline {
             echo "❌ Pipeline failed!"
             sh """
                 echo "=== Debug info ==="
-                kubectl describe deployment/webserver -n ${APP_NS}
+                microk8s kubectl describe deployment/webserver -n ${APP_NS}
                 echo ""
-                kubectl logs -n ${APP_NS} deployment/webserver --tail=20
+                microk8s kubectl logs -n ${APP_NS} deployment/webserver --tail=20
             """
         }
     } 
