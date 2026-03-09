@@ -23,6 +23,7 @@ pipeline {
         APP_NS = "flask-app"
         IMAGE_NAME = "flask-webserver:v1"
         DOCKERFILE_DIR = "flaskServer/webserver"
+        PROXY_URL = credentials('proxy-url')
     } 
   
     stages { 
@@ -55,7 +56,10 @@ pipeline {
                     dir(DOCKERFILE_DIR) {
                         sh """  
                             export DOCKER_BUILDKIT=0
-                            docker build --network=host -t ${IMAGE_NAME} .
+                            docker build --network=host \
+                            --build-arg HTTP_PROXY=${PROXY_URL} \
+                            --build-arg HTTPS_PROXY=${PROXY_URL} \
+                            -t ${IMAGE_NAME} .
                         """
                     }
                 }
