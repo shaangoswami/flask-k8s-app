@@ -55,7 +55,7 @@ pipeline {
                     dir(DOCKERFILE_DIR) {
                         sh """  
                             export DOCKER_BUILDKIT=0
-                            docker build -t ${IMAGE_NAME} .
+                            docker build --network=host -t ${IMAGE_NAME} .
                         """
                     }
                 }
