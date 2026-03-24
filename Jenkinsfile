@@ -23,7 +23,7 @@ pipeline {
         IMAGE_REPO = "shaangoswami/flask-webserver"
         DOCKERFILE_DIR = "flaskServer/webserver"
         PROXY_URL = credentials('proxy-url')
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     } 
   
     stages { 
