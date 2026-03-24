@@ -19,7 +19,7 @@ pipeline {
     environment { 
         PATH = "/snap/bin:${env.PATH}"
         K8S_DIR = "k8s" 
-        APP_NS = "flask-app"
+        // APP_NS = "flask-app"
         IMAGE_REPO = "shaangoswami/flask-webserver"
         DOCKERFILE_DIR = "flaskServer/webserver"
         PROXY_URL = credentials('proxy-url')
@@ -167,22 +167,22 @@ pipeline {
         always { 
             echo "📊 Deployment Status: "
             sh """
-                kubectl get pods -n ${APP_NS}
+                kubectl get pods -n flask-app
                 echo ""
-                kubectl get svc -n ${APP_NS}
+                kubectl get svc -n flask-app
             """
-            sh "docker rmi ${IMAGE_NAME} 2>/dev/null || true"
+            sh "docker rmi ${env.IMAGE_NAME} 2>/dev/null || true"
         }
         failure {
             echo "❌ Pipeline failed!"
             sh """
                 echo "=== Debug info ==="
-                microk8s kubectl describe deployment/webserver -n ${APP_NS}
+                microk8s kubectl describe deployment/webserver -n flask-app
                 echo ""
-                microk8s kubectl logs -n ${APP_NS} deployment/webserver --tail=20
+                microk8s kubectl logs -n flask-app deployment/webserver --tail=20
             """
         }
-    } 
+    }
 }
 // pipeline { 
 //     agent { label 'kubectl-agent' } 
