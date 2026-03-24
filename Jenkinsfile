@@ -165,22 +165,26 @@ pipeline {
   
     post { 
         always { 
-            echo "📊 Deployment Status: "
-            sh """
-                kubectl get pods -n flask-app
-                echo ""
-                kubectl get svc -n flask-app
-            """
-            sh "docker rmi ${env.IMAGE_NAME} 2>/dev/null || true"
+            node('kubectl-agent') {
+                echo "📊 Deployment Status: "
+                sh """
+                    kubectl get pods -n flask-app
+                    echo ""
+                    kubectl get svc -n flask-app
+                """
+                sh "docker rmi ${env.IMAGE_NAME} 2>/dev/null || true"
+            }
         }
         failure {
-            echo "❌ Pipeline failed!"
-            sh """
-                echo "=== Debug info ==="
-                microk8s kubectl describe deployment/webserver -n flask-app
-                echo ""
-                microk8s kubectl logs -n flask-app deployment/webserver --tail=20
-            """
+            node('kubectl-agent') {
+                echo "❌ Pipeline failed!"
+                sh """
+                    echo "=== Debug info ==="
+                    microk8s kubectl describe deployment/webserver -n flask-app
+                    echo ""
+                    microk8s kubectl logs -n flask-app deployment/webserver --tail=20
+                """
+            }
         }
     }
 }
