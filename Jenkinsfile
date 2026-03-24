@@ -20,9 +20,10 @@ pipeline {
         PATH = "/snap/bin:${env.PATH}"
         K8S_DIR = "k8s" 
         APP_NS = "flask-app"
-        IMAGE_NAME = "flask-webserver:v1"
+        IMAGE_REPO = "shaangoswami/flask-webserver"
         DOCKERFILE_DIR = "flaskServer/webserver"
         PROXY_URL = credentials('proxy-url')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
     } 
   
     stages { 
@@ -35,9 +36,12 @@ pipeline {
         stage('Capture Commit ID') {
             steps {
                 script {
-                    def commitId = env.GIT_COMMIT
+                    env.COMMIT_ID = env.GIT_COMMIT.take(7)
+                    env.IMAGE_NAME = "${env.IMAGE_REPO}:${env.COMMIT_ID}"
+                    echo "🏷️ Image will be tagged as: ${env.IMAGE_NAME}"
+
                     sh """
-                        sed -i 's/__COMMIT_ID__/${commitId}/g' flaskServer/webserver/templates/index.html
+                        sed -i 's/__COMMIT_ID__/${env.COMMIT_ID}/g' flaskServer/webserver/templates/index.html
                     """
                 }
             }
@@ -46,12 +50,12 @@ pipeline {
         stage('Build') { 
             agent {
                 kubernetes {
-                    inheritFrom 'docker-agent-v2'  // <-- Using the new verified agent
+                    inheritFrom 'docker-agent-v2'
                 }
             }
             
             steps { 
-                container('jnlp') { // 'docker-agent-v2' uses 'jnlp' for the main container
+                container('jnlp') {
                     dir(DOCKERFILE_DIR) {
                         sh """  
                             export DOCKER_BUILDKIT=0
@@ -68,7 +72,7 @@ pipeline {
         stage('Test') { 
             agent {
                 kubernetes {
-                    inheritFrom 'docker-agent-v2'  // <-- Using the new verified agent
+                    inheritFrom 'docker-agent-v2'
                 }
             }
             
@@ -85,17 +89,36 @@ pipeline {
             } 
         }
 
-        stage('Import to K8s') { 
-            // This stage runs on the top-level agent ('kubectl-agent')
+        stage('Push to Docker Hub') { 
+            agent {
+                kubernetes {
+                    inheritFrom 'docker-agent-v2'
+                }
+            }
+            
+            steps { 
+                container('jnlp') {
+                    sh """
+                        echo "🔐 Logging in to Docker Hub..."
+                        echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
+
+                        echo "⬆️ Pushing image to Docker Hub..."
+                        docker push ${IMAGE_NAME}
+                        echo "✅ Image pushed: ${IMAGE_NAME}"
+                        
+                        docker logout
+                    """
+                }
+            } 
+        }
+
+        stage('Pull to K8s Node') { 
             steps { 
                 sh """
-                    echo "⬆️ Importing to MicroK8s..."
-                    docker save ${IMAGE_NAME} -o /tmp/flask-image.tar
-                    microk8s.ctr --namespace k8s.io image rm ${IMAGE_NAME} || true
-                    microk8s.ctr --namespace k8s.io image import /tmp/flask-image.tar
-                    rm -f /tmp/flask-image.tar
+                    echo "⬇️ Pulling image from Docker Hub into MicroK8s..."
+                    microk8s.ctr --namespace k8s.io image pull docker.io/${IMAGE_NAME}
                     
-                    echo "✅ Available images: "
+                    echo "✅ Available images:"
                     microk8s.ctr --namespace k8s.io images ls | grep flask-webserver
                 """
             } 
@@ -104,11 +127,10 @@ pipeline {
         stage('Deploy') { 
             steps { 
                 sh """
-                    echo "Verifying generated yaml" 
+                    echo "1️⃣ Patching deployment with new image..."
                     sed "s|image:.*|image: ${IMAGE_NAME}|g" ${K8S_DIR}/webserver-deployment.yaml | kubectl apply -n ${APP_NS} -f -
                     
-                    echo "2️⃣ Deploying Webserver..."
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
+                    echo "2️⃣ Deploying Webserver services..."
                     kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
                     echo "3️⃣ Forcing cleanup of any 'ghost' or 'stuck' pods"
@@ -162,8 +184,6 @@ pipeline {
         }
     } 
 }
-
-
 // pipeline { 
 //     agent { label 'kubectl-agent' } 
 
