@@ -50,7 +50,7 @@ pipeline {
         stage('Build') { 
             agent {
                 kubernetes {
-                    inheritFrom 'jenkins-agent'
+                    inheritFrom 'docker-agent-v2'
                 }
             }
             
@@ -72,7 +72,7 @@ pipeline {
         stage('Test') { 
             agent {
                 kubernetes {
-                    inheritFrom 'jenkins-agent'
+                    inheritFrom 'docker-agent-v2'
                 }
             }
             
@@ -92,7 +92,7 @@ pipeline {
         stage('Push to Docker Hub') { 
             agent {
                 kubernetes {
-                    inheritFrom 'jenkins-agent'
+                    inheritFrom 'docker-agent-v2'
                 }
             }
             
