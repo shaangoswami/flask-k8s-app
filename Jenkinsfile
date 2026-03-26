@@ -130,22 +130,24 @@ pipeline {
                     echo "1️⃣ Patching deployment with new image..."
                     IMAGE=${IMAGE_NAME}
                     sed "s|image:.*|image: docker.io/\$IMAGE|g" ${K8S_DIR}/webserver-deployment.yaml | microk8s kubectl apply -n ${APP_NS} -f -
+        
                     echo "2️⃣ Deploying Webserver services..."
                     microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
-
+        
                     echo "3️⃣ Forcing cleanup of any 'ghost' or 'stuck' pods"
-                    microk8s kubectl get pods -n flask-app | grep -v 'Running' | grep -v 'NAME' | awk '{print $1}' | xargs microk8s kubectl delete pod -n flask-app --force --grace-period=0 || true
-                   
+                    microk8s kubectl get pods -n ${APP_NS} | grep -v 'Running' | grep -v 'NAME' | awk '{print \$1}' | xargs microk8s kubectl delete pod -n ${APP_NS} --force --grace-period=0 || true
+        
                     echo "4️⃣ Monitoring Rollout (3-minute timeout)"
-                    if ! kubectl rollout status deployment/webserver -n flask-app --timeout=180s; then
+                    if ! microk8s kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s; then
                         echo "❌ Rollout timed out! Forcing a restart..."
-                        microk8s kubectl rollout restart deployment/webserver -n flask-app
+                        microk8s kubectl rollout restart deployment/webserver -n ${APP_NS}
                         exit 1
                     fi
                     echo "✅ All deployments complete!"
                 """
             } 
         }
+
         
         stage('Print Commit Details') {
             steps {
@@ -168,9 +170,9 @@ pipeline {
             node('kubectl-agent') {
                 echo "📊 Deployment Status: "
                 sh """
-                    kubectl get pods -n flask-app || true
+                    microk8s kubectl get pods -n flask-app || true
                     echo ""
-                    kubectl get svc -n flask-app || true
+                    microk8s kubectl get svc -n flask-app || true
                 """
             }
         }
