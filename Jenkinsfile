@@ -19,7 +19,7 @@ pipeline {
     environment { 
         PATH = "/snap/bin:${env.PATH}"
         K8S_DIR = "k8s" 
-        // APP_NS = "flask-app"
+        APP_NS = "flask-app"
         IMAGE_REPO = "shaangoswami/flask-webserver"
         DOCKERFILE_DIR = "flaskServer/webserver"
         PROXY_URL = credentials('proxy-url')
@@ -131,15 +131,15 @@ pipeline {
                     sed "s|image:.*|image: ${IMAGE_NAME}|g" ${K8S_DIR}/webserver-deployment.yaml | kubectl apply -n ${APP_NS} -f -
                     
                     echo "2️⃣ Deploying Webserver services..."
-                    kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
+                    microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
                     echo "3️⃣ Forcing cleanup of any 'ghost' or 'stuck' pods"
-                    kubectl get pods -n flask-app | grep -v 'Running' | awk '{print \$1}' | xargs kubectl delete pod -n flask-app --force --grace-period=0 || true
+                    microk8s kubectl get pods -n flask-app | grep -v 'Running' | grep -v 'NAME' | awk '{print $1}' | xargs microk8s kubectl delete pod -n flask-app --force --grace-period=0 || true
                    
                     echo "4️⃣ Monitoring Rollout (3-minute timeout)"
                     if ! kubectl rollout status deployment/webserver -n flask-app --timeout=180s; then
                         echo "❌ Rollout timed out! Forcing a restart..."
-                        kubectl rollout restart deployment/webserver -n flask-app
+                        microk8s kubectl rollout restart deployment/webserver -n flask-app
                         exit 1
                     fi
                     echo "✅ All deployments complete!"
