@@ -128,8 +128,8 @@ pipeline {
             steps { 
                 sh """
                     echo "1️⃣ Patching deployment with new image..."
-                    sed "s|image:.*|image: ${IMAGE_NAME}|g" ${K8S_DIR}/webserver-deployment.yaml | kubectl apply -n ${APP_NS} -f -
-                    
+                    IMAGE=${IMAGE_NAME}
+                    sed "s|image:.*|image: docker.io/\$IMAGE|g" ${K8S_DIR}/webserver-deployment.yaml | microk8s kubectl apply -n ${APP_NS} -f -
                     echo "2️⃣ Deploying Webserver services..."
                     microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
 
