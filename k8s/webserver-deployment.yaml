@@ -4,8 +4,11 @@ metadata:
   name: webserver
 spec:
   replicas: 1
-  strategy: 
-    type: Recreate 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: webserver
@@ -16,8 +19,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: flask-webserver:v1
-        imagePullPolicy: IfNotPresent
+        image: shaangoswami/flask-webserver:TAG_WILL_BE_SET_BY_JENKINS
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
-          
