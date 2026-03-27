@@ -128,9 +128,7 @@ pipeline {
             steps { 
                 sh """
                     echo "1️⃣ Patching deployment with new image..."
-                    IMAGE=${IMAGE_NAME}
-                    sed "s|image:.*|image: docker.io/\$IMAGE|g" ${K8S_DIR}/webserver-deployment.yaml | microk8s kubectl apply -n ${APP_NS} -f -
-        
+                    microk8s kubectl set image deployment/webserver webserver=docker.io/${IMAGE_NAME} -n ${APP_NS}
                     echo "2️⃣ Deploying Webserver services..."
                     microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
         
@@ -146,6 +144,16 @@ pipeline {
                     echo "✅ All deployments complete!"
                 """
             } 
+        }
+
+        stage('Update Image') {
+            steps {
+                sh """
+                    echo " Setting deployment image ..."
+                    microk8s kubectl set image deployment/webserver webserver=docker.io/${IMAGE_NAME} -n ${APP_NS}
+                    microk8s kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s
+                """
+            }
         }
 
         
