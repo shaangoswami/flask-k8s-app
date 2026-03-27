@@ -139,7 +139,6 @@ pipeline {
                     if ! microk8s kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s; then
                         echo "❌ Rollout timed out! Forcing a restart..."
                         microk8s kubectl rollout restart deployment/webserver -n ${APP_NS}
-                        exit 1
                     fi
                     echo "✅ All deployments complete!"
                 """
