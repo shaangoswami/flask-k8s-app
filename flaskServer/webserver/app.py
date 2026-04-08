@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-import subprocess
+import requests
 
 
 app = Flask(__name__)
@@ -16,9 +16,13 @@ def home():
     visitor_ip = request.remote_addr
     visit_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     visitors.append({'ip': visitor_ip, 'time': visit_time})
-    commits = subprocess.getoutput(
-        "git log --pretty=format:'%h - %s' -n 5"
-    ).split("\n")
+    url = "https://api.github.com/repos/shaangoswami/flask-k8s-app/commits"
+    response = requests.get(url)
+
+    commits = [
+        f"{c['sha'][:7]} - {c['commit']['message']}"
+        for c in response.json()[:5]
+    ]
     
     return render_template('index.html', commits=commits)
 
