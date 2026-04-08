@@ -36,7 +36,12 @@
                             <h1>🚀 Deployment Successful</h1>
                             <p>CI/CD Pipeline Triggered</p>
                             <p class="commit">
-                              <h3>Build Commit: __COMMIT_ID__</h3>
+                              <h3>Recent Commits:</h3>
+                              <ul>
+                                {% for commit in commits %}
+                                    <li>{{ commit }}</li>
+                                {% endfor %}
+                              </ul>
                             </p>
                         </div>
                         
