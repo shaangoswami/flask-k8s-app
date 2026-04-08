@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
+import subprocess
+
 
 app = Flask(__name__)
 
@@ -14,8 +16,11 @@ def home():
     visitor_ip = request.remote_addr
     visit_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     visitors.append({'ip': visitor_ip, 'time': visit_time})
+    commits = subprocess.getoutput(
+        "git log --pretty=format:'%h - %s' -n 5"
+    ).split("\n")
     
-    return render_template('index.html')
+    return render_template('index.html', commits=commits)
 
 @app.route('/api/stats')
 def get_stats():
