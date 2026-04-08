@@ -131,7 +131,7 @@ pipeline {
                     echo "🚀 Deploying ${IMAGE_NAME}..."
                     
                     echo "1️⃣ Setting deployment image..."
-                    microk8s kubectl set image deployment/webserver webserver=docker.io/${IMAGE_NAME} -n ${APP_NS}
+                    microk8s kubectl set image deployment/webserver webserver=${IMAGE_NAME} -n ${APP_NS}
                     
                     echo "2️⃣ Applying service configuration..."
                     microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
