@@ -129,20 +129,22 @@ pipeline {
             steps {
                 sh """
                     echo "🚀 Deploying ${IMAGE_NAME}..."
-                    echo "🔧 Setting nodeSelector to kc-m1..."
-
-                    // microk8s kubectl patch deployment webserver -n ${APP_NS} \
-                    //     -p '{"spec":{"template":{"spec":{"nodeSelector":{"kubernetes.io/hostname":"kc-m1"}}}}}'
-                    
+        
+                    echo "📦 Applying deployment..."
+                    microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-deployment.yaml
+        
+                    echo "📦 Applying service..."
                     microk8s kubectl apply -n ${APP_NS} -f ${K8S_DIR}/webserver-service.yaml
-                    echo "1️⃣ Setting deployment image..."
-                    microk8s kubectl set image deployment/webserver webserver=${IMAGE_NAME} -n ${APP_NS}
-                    
-                    echo "2️⃣ Applying service configuration..."
-                    
-                    
-                    echo "3️⃣ Waiting for rollout..."
+        
+                    echo "🔄 Updating image..."
+                    microk8s kubectl set image deployment/webserver \
+                      webserver=${IMAGE_NAME} -n ${APP_NS}
+        
+                    echo "⏳ Waiting for rollout..."
                     microk8s kubectl rollout status deployment/webserver -n ${APP_NS} --timeout=180s
+        
+                    echo "📍 Pod placement:"
+                    microk8s kubectl get pods -o wide -n ${APP_NS}
                 """
             }
         }
