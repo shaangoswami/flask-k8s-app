@@ -17,6 +17,8 @@ spec:
       labels:
         app: webserver
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: kc-m1
       containers:
       - name: webserver
         image: shaangoswami/flask-webserver:TAG_WILL_BE_SET_BY_JENKINS
