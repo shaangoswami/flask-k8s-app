@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-
+import requests
 
 app = Flask(__name__)
 
@@ -16,7 +16,7 @@ def home():
     visit_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     visitors.append({'ip': visitor_ip, 'time': visit_time})
     url = "https://api.github.com/repos/shaangoswami/flask-k8s-app/commits"
-    response = request.get(url)
+    response = requests.get(url)
 
     commits = [
         f"{c['sha'][:7]} - {c['commit']['message']}"
