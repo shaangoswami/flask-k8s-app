@@ -1,12 +1,14 @@
 pipeline {
     agent any
+
     parameters {
-        choice(name: 'VERSION', choices : ['1.1.0', '1.1.1'], description: '')
-        booleanParam(name: 'executeTests', defaultValue: false, description: '')
+        choice(name: 'VERSION', choices: ['1.1.0', '1.1.1'], description: 'Select version')
+        booleanParam(name: 'EXECUTE_TESTS', defaultValue: false, description: 'Run tests?')
     }
+
     stages {
         stage('Build') {
-             when {
+            when {
                 expression {
                     return env.BRANCH_NAME == 'main'
                 }
@@ -15,23 +17,23 @@ pipeline {
                 echo 'building the app'
             }
         }
+
         stage('Test') {
-           when {
-               expression {
-                   params.executeTests
-               }
-           }   
+            when {
+                expression {
+                    return params.EXECUTE_TESTS
+                }
+            }
             steps {
-                echo 'Hello World'
+                echo 'Running tests...'
             }
         }
+
         stage('Deploy') {
             steps {
                 echo 'Deploying the project'
-                echo "deploying ${params.VERSION}"
-                }
+                echo "Deploying version ${params.VERSION}"
             }
         }
-        
     }
 }
