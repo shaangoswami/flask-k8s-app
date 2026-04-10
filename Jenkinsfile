@@ -9,9 +9,7 @@ pipeline {
     stages {
         stage('Build') {
             when {
-                expression {
-                    return env.BRANCH_NAME == 'main'
-                }
+                branch 'main'
             }
             steps {
                 echo 'building the app'
